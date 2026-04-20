@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPulse | Student Engagement Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js 4.4 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i data-lucide="graduation-cap"></i>
+                <span>EduPulse</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard">
+                    <i data-lucide="layout-dashboard"></i> Overview
+                </li>
+                <li data-view="roster">
+                    <i data-lucide="users"></i> Student Roster
+                </li>
+                <li data-view="alerts">
+                    <i data-lucide="alert-triangle"></i> At-Risk Alerts
+                    <span class="badge" id="alert-badge">0</span>
+                </li>
+                <li data-view="add-student">
+                    <i data-lucide="user-plus"></i> Add Student
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title">Class Overview</h1>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="export-csv">
+                        <i data-lucide="download"></i> Export CSV
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="view active">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <h3>Average Engagement</h3>
+                            <div class="kpi-value" id="kpi-avg-score">--</div>
+                        </div>
+                        <div class="kpi-card">
+                            <h3>Total Students</h3>
+                            <div class="kpi-value" id="kpi-total-students">--</div>
+                        </div>
+                        <div class="kpi-card alert-kpi">
+                            <h3>At-Risk Students</h3>
+                            <div class="kpi-value" id="kpi-at-risk">--</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Engagement Distribution</h3>
+                            <canvas id="distChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Participation vs Quiz Score</h3>
+                            <canvas id="scatterChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Sentiment Breakdown</h3>
+                            <canvas id="sentimentChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Class Averages</h3>
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Roster View -->
+                <section id="view-roster" class="view">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input" placeholder="Search students...">
+                        </div>
+                        <select id="filter-select" class="filter-select">
+                            <option value="all">All Engagement Levels</option>
+                            <option value="high">High Engagement (≥75)</option>
+                            <option value="medium">Medium Engagement (50-74)</option>
+                            <option value="low">Low Engagement (&lt;50)</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Participation (40%)</th>
+                                    <th>Quiz (40%)</th>
+                                    <th>Sentiment (20%)</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-tbody">
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Alerts View -->
+                <section id="view-alerts" class="view">
+                    <div class="alerts-container" id="alerts-container">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- Add Student form -->
+                <section id="view-add-student" class="view">
+                    <div class="form-card">
+                        <h2>Add New Student Data</h2>
+                        <form id="add-student-form">
+                            <div class="form-group">
+                                <label>Student Name</label>
+                                <input type="text" id="form-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Participation Score (0-100)</label>
+                                <input type="number" id="form-participation" min="0" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Average Quiz Score (0-100)</label>
+                                <input type="number" id="form-quiz" min="0" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Overall Sentiment</label>
+                                <select id="form-sentiment" required>
+                                    <option value="positive">Positive</option>
+                                    <option value="neutral">Neutral</option>
+                                    <option value="negative">Negative</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Weekly Trend</label>
+                                <select id="form-trend" required>
+                                    <option value="improving">Improving</option>
+                                    <option value="stable">Stable</option>
+                                    <option value="declining">Declining</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Student</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
